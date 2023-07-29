@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebRTC</title>
+</head>
+
+<body>
+
+  <h1>Basic Setup using BroadCastChannel WebAPI without signalling server</h1>
+
+  <div>
+    <video id="local" autoplay playsinline></video>
+    <video id="remote" autoplay playsinline></video>
+  </div>
+
+  <button id="make-offer">make offer</button>
+
+  <script>
+    let localStream, remoteStream;
+
+    var peerConnection = new RTCPeerConnection()
+
+    // creates braodcast channel that listens under the topic "broadcast"
+    var broadCast = new BroadcastChannel("broadcast")
+    var count1 = 0;
+
+    async function init() {
+
+      // getting a persmission for video/audio from user
+      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then((stream) => {
+        remoteStream = new MediaStream()
+
+        // setting streaming on video
+        document.getElementById("local").srcObject = stream;
+        document.getElementById("remote").srcObject = remoteStream;
+
+        // By adding the tracks to the peerConnection, we are making them available for transmission to the remote peer during the WebRTC session
+        stream.getTracks().forEach((track) => {
+          peerConnection.addTrack(track, stream);
+        })
+
+        // is triggered when a remote media track (e.g., video or audio) is received from the remote peer.
+        peerConnection.ontrack = (event) => {
+          event.streams[0].getTracks().forEach((track) => {
+            remoteStream.addTrack(track)
+          })
+        }
+      })
+
+
+      broadCast.onmessage = async (e) => {
+
+        // on getting an offer, create an answer for the offer (accept the offer)
+        if (e.data.type == "offer") {
+
+          // create answer and local descriptor is set, this will be getting called with candidate
+          peerConnection.onicecandidate = async (event) => {
+            if (event.candidate) {
+              broadCast.postMessage({ type: "answer", msg: JSON.stringify(peerConnection.localDescription) })
+            }
+          }
+
+          // upon receiving offer, set remote descriptor for User B
+          await peerConnection.setRemoteDescription(JSON.parse(e.data.msg))
+          let answer = await peerConnection.createAnswer();
+
+          // created an answer, set the local descriptor for User B
+          await peerConnection.setLocalDescription(answer);
+
+        } else if (e.data.type == "answer") {
+
+          // upon receiving answer, set the remote descriptor for User A
+          if (!peerConnection.currentRemoteDescription) {
+            peerConnection.setRemoteDescription(JSON.parse(e.data.msg))
+          }
+
+        }
+
+      }
+    }
+
+    async function createOffer() {
+      // when creat offer and local descriptor is set, this will be getting called with candidate
+      peerConnection.onicecandidate = async (event) => {
+        if (event.candidate) {
+          broadCast.postMessage({ type: "offer", msg: JSON.stringify(peerConnection.localDescription) })
+        }
+      }
+
+      // create a offer
+      const offer = await peerConnection.createOffer()
+      // set the local descriptor for User A
+      await peerConnection.setLocalDescription(offer)
+    }
+
+    init()
+    document.getElementById('make-offer').addEventListener('click', createOffer)
+
+  </script>
+</body>
+
+</html>
