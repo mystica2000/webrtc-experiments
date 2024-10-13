@@ -6,5 +6,5 @@ checkout my blog post on [webrtc](https://mystica.me/blog/webrtc/) for understan
 
 This repo is to play around and experiment with webrtc technology!
 
-[broadcast-channel](https://github.com/mystica2000/webrtc-experiments/tree/main/src/broadcast-channel) - uses broadcast channel as signalling server for a simple setup to understand webrtc
-[webrtc-mono-repo](https://github.com/mystica2000/webrtc-experiments/tree/main/src/webrtc-mono-repo) - contains socket io as signalling server (includes: video call, mouse pointer position)
+- [broadcast-channel](https://github.com/mystica2000/webrtc-experiments/tree/main/src/broadcast-channel) - uses broadcast channel as signalling server for a simple setup to understand webrtc
+- [webrtc-mono-repo](https://github.com/mystica2000/webrtc-experiments/tree/main/src/webrtc-mono-repo) - contains socket io as signalling server (includes: video call, mouse pointer position)
