@@ -1,0 +1,29 @@
+<router-outlet></router-outlet>
+
+@if (videoMode) {
+
+<video id="local" autoplay playsinline width="250px" height="250px"
+    [srcObject]="signallingService.localStreamSignal()"></video>
+<video id="remote" autoplay playsinline width="250px" height="250px"
+    [srcObject]="signallingService.remoteStreamSignal() "></video>
+}
+
+
+@if (videoMode == false) {
+<div class="mouse" [ngStyle]="{
+    'left.px': signallingService.xSignal(),
+    'top.px': signallingService.ysignal(),
+    'transform': 'translate(-50%, -50%)'
+  }"> remote
+</div>
+}
+
+<button (click)="startCamera()">start camera</button>
+
+@if (videoMode) {
+<button id="make-offer" (click)="makeOffer()">make offer</button>
+<button (click)="closeVideoCall()">close</button>
+} @else {
+<button (click)="trackMousePointer()">track pointer</button>
+<button (click)="closeTrackPointer()">close</button>
+}
