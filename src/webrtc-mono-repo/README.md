@@ -23,3 +23,7 @@ To run the backend nodejs server -
 ```sh
 npx nx serve backend
 ```
+
+
+https://github.com/user-attachments/assets/4bbb2673-e402-4f5f-97b1-1214bbe80669
+
